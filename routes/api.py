@@ -14,7 +14,7 @@ def upvote(link_id):
     if vote:
         return jsonify({'error': 'You have already voted for this link'}), 400
     
-    new_vote = Vote(user_id=current_user.id, link_id=link_id)
+    new_vote = Vote(user=current_user, link=link)
     db.session.add(new_vote)
     link.score += 1
     db.session.commit()

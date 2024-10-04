@@ -8,19 +8,30 @@ fake = Faker()
 ANCIENT_HISTORY_TOPICS = [
     "Ancient Egypt", "Roman Empire", "Greek Civilization", "Mesopotamia",
     "Indus Valley Civilization", "Ancient China", "Mayan Civilization",
-    "Inca Empire", "Aztec Empire", "Persia", "Carthage", "Phoenicia",
-    "Babylon", "Assyria", "Hittite Empire", "Minoan Civilization",
-    "Mycenaean Greece", "Sumer", "Akkadian Empire", "Ancient Nubia"
+    "Inca Empire", "Aztec Empire", "Persian Empire", "Carthaginian Empire", "Phoenician Civilization",
+    "Babylonian Empire", "Assyrian Empire", "Hittite Empire", "Minoan Civilization",
+    "Mycenaean Greece", "Sumerian Civilization", "Akkadian Empire", "Ancient Nubia",
+    "Etruscan Civilization", "Scythian Culture", "Olmec Civilization", "Zapotec Civilization",
+    "Parthian Empire", "Kushite Kingdom", "Nabataean Kingdom", "Xiongnu Confederation",
+    "Gupta Empire", "Maurya Empire", "Qin Dynasty", "Han Dynasty"
 ]
 
 ANCIENT_HISTORY_PHRASES = [
-    "Discoveries in", "New findings about", "The rise and fall of",
-    "Uncovering secrets of", "Archaeological breakthroughs in",
-    "The mysteries of", "Daily life in", "Warfare and politics in",
-    "Art and culture of", "Religious practices in", "Trade routes of",
-    "Technological advancements in", "The rulers of", "Monuments and architecture of",
-    "Ancient texts reveal", "Myths and legends of", "The fall of",
-    "Excavations uncover", "Historical analysis of", "Reconstructing"
+    "New archaeological discoveries in", "Unveiling the mysteries of",
+    "Technological advancements of", "Political intrigue in",
+    "Religious practices of", "Architectural wonders of",
+    "Trade networks of", "Military strategies of",
+    "Cultural exchanges between", "Ancient texts reveal secrets of",
+    "Forgotten heroes of", "Environmental impact on",
+    "Artistic achievements of", "Scientific knowledge in",
+    "Women's roles in", "Childhood and education in",
+    "Maritime explorations of", "Agricultural innovations in",
+    "Linguistic developments in", "Mythological beliefs of",
+    "Astronomical observations by", "Medical practices in",
+    "Culinary traditions of", "Fashion and clothing in",
+    "Sports and games in", "Musical instruments of",
+    "Burial customs of", "Weaponry and warfare in",
+    "Royal dynasties of", "Legal systems in"
 ]
 
 def generate_ancient_history_title():
@@ -29,8 +40,9 @@ def generate_ancient_history_title():
     return f"{phrase} {topic}"
 
 def generate_ancient_history_url():
+    base_domains = ["ancienthistorytoday.com", "archaeologydaily.net", "historicalfindings.org", "pastcivilizations.info"]
     topic = random.choice(ANCIENT_HISTORY_TOPICS).lower().replace(" ", "-")
-    return f"https://ancient-history-news.com/{topic}/{fake.slug()}"
+    return f"https://www.{random.choice(base_domains)}/{topic}/{fake.slug()}"
 
 def seed_database():
     # Clear existing data
@@ -40,9 +52,9 @@ def seed_database():
     db.session.query(User).delete()
     db.session.commit()
 
-    # Create 5 users
+    # Create 10 users
     users = []
-    for _ in range(5):
+    for _ in range(10):
         user = User(
             username=fake.user_name(),
             email=fake.email(),
@@ -52,9 +64,9 @@ def seed_database():
         db.session.add(user)
     db.session.commit()
 
-    # Create 50 links
+    # Create 100 links
     links = []
-    for _ in range(50):
+    for _ in range(100):
         link = Link(
             title=generate_ancient_history_title(),
             url=generate_ancient_history_url(),
@@ -64,18 +76,19 @@ def seed_database():
         db.session.add(link)
     db.session.commit()
 
-    # Create 100 votes
-    for _ in range(100):
-        vote = Vote(
-            user=random.choice(users),
-            link=random.choice(links)
-        )
-        db.session.add(vote)
-        link.score += 1
+    # Create 200 votes
+    for _ in range(200):
+        link = random.choice(links)
+        user = random.choice(users)
+        existing_vote = Vote.query.filter_by(user_id=user.id, link_id=link.id).first()
+        if not existing_vote:
+            vote = Vote(user=user, link=link)
+            db.session.add(vote)
+            link.score += 1
     db.session.commit()
 
-    # Create 200 comments (some as replies)
-    for _ in range(200):
+    # Create 300 comments (some as replies)
+    for _ in range(300):
         parent = None
         if random.random() < 0.3 and Comment.query.count() > 0:
             parent = random.choice(Comment.query.all())
