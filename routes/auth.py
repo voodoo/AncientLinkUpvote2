@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, EqualTo
 from models import User
 from app import db, login_manager
 
@@ -19,23 +19,27 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Log In')
 
+class SignupForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        
-        user = User.query.filter_by(email=email).first()
+    form = SignupForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
         if user:
             flash('Email address already exists')
             return redirect(url_for('auth.signup'))
         
-        new_user = User(username=username, email=email)
-        new_user.set_password(password)
+        new_user = User(username=form.username.data, email=form.email.data)
+        new_user.set_password(form.password.data)
         
         db.session.add(new_user)
         db.session.commit()
@@ -43,7 +47,7 @@ def signup():
         login_user(new_user)
         return redirect(url_for('main.index'))
     
-    return render_template('signup.html')
+    return render_template('signup.html', form=form)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
