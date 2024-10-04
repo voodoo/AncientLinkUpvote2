@@ -25,6 +25,7 @@ class Link(db.Model):
     score = db.Column(db.Integer, default=0)
 
     user = db.relationship('User', backref=db.backref('links', lazy=True))
+    votes = db.relationship('Vote', backref='link', lazy='dynamic', cascade='all, delete-orphan')
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,4 +46,3 @@ class Vote(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('votes', lazy=True))
-    link = db.relationship('Link', backref=db.backref('votes', lazy=True))

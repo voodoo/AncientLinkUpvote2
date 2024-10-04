@@ -26,7 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     const scoreElement = document.getElementById(`score-${linkId}`);
-                    scoreElement.textContent = data.new_score;
+                    if (scoreElement) {
+                        scoreElement.textContent = data.new_score;
+                    } else {
+                        console.error(`Score element not found for link ${linkId}`);
+                    }
                     this.classList.add('text-blue-500');
                     this.disabled = true;
                 } else {
