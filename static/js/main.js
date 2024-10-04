@@ -16,9 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('You must be logged in to vote');
-                    }
                     return response.json().then(err => { throw err; });
                 }
                 return response.json();
@@ -31,7 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         console.error(`Score element not found for link ${linkId}`);
                     }
-                    this.classList.add('text-blue-500');
+                    this.classList.remove('upvote-btn-inactive');
+                    this.classList.add('upvote-btn-active');
                     this.disabled = true;
                 } else {
                     throw new Error(data.error || 'An error occurred while voting');
@@ -39,9 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                if (error.message === 'You must be logged in to vote') {
+                if (error.message === 'Unauthorized') {
                     const currentPath = encodeURIComponent(window.location.pathname);
                     window.location.href = `/login?next=${currentPath}`;
+                } else if (error.message === 'You have already voted for this link') {
+                    this.classList.remove('upvote-btn-inactive');
+                    this.classList.add('upvote-btn-active');
+                    this.disabled = true;
                 } else {
                     alert(error.message || 'An error occurred while voting');
                 }

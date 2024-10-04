@@ -2,8 +2,22 @@
 .upvote-btn {
     cursor: pointer;
     user-select: none;
+    transition: all 0.3s ease;
 }
 
-.upvote-btn:hover {
+.upvote-btn-inactive {
+    color: #718096;
+}
+
+.upvote-btn-inactive:hover {
     color: #4a5568;
+}
+
+.upvote-btn-active {
+    color: #4299e1;
+}
+
+.upvote-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
 }

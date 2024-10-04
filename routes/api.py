@@ -9,11 +9,12 @@ bp = Blueprint('api', __name__)
 @login_required
 def upvote(link_id):
     try:
+        current_app.logger.info(f"User {current_user.id} attempting to upvote link {link_id}")
         link = Link.query.get_or_404(link_id)
         vote = Vote.query.filter_by(user_id=current_user.id, link_id=link_id).first()
         
         if vote:
-            current_app.logger.info(f"User {current_user.id} attempted to upvote link {link_id} again")
+            current_app.logger.info(f"User {current_user.id} has already voted for link {link_id}")
             return jsonify({'error': 'You have already voted for this link'}), 400
         
         new_vote = Vote(user=current_user, link=link)
