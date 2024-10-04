@@ -2,11 +2,19 @@
 
 {% block content %}
 <div class="space-y-4">
-    <h2 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"</h2>
+    <h2 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"{% if user %} by user "{{ user }}"{% endif %}</h2>
 
-    {% if links %}
+    <form action="{{ url_for('main.search') }}" method="GET" class="mb-4">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
+        <input type="text" name="user" value="{{ user }}" placeholder="Filter by user..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
+        <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">
+            Search
+        </button>
+    </form>
+
+    {% if links.items %}
     <h3 class="text-xl font-bold mb-2">Links</h3>
-    {% for link in links %}
+    {% for link in links.items %}
     <div class="bg-white shadow-md rounded-lg p-4">
         <div class="flex items-center">
             <span class="font-bold mr-2">{{ link.score }}</span>
@@ -19,11 +27,20 @@
         </div>
     </div>
     {% endfor %}
+    
+    <div class="mt-4">
+        {% if links.has_prev %}
+            <a href="{{ url_for('main.search', q=query, user=user, page=links.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
+        {% endif %}
+        {% if links.has_next %}
+            <a href="{{ url_for('main.search', q=query, user=user, page=links.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
+        {% endif %}
+    </div>
     {% endif %}
 
-    {% if comments %}
+    {% if comments.items %}
     <h3 class="text-xl font-bold mb-2 mt-6">Comments</h3>
-    {% for comment in comments %}
+    {% for comment in comments.items %}
     <div class="bg-white shadow-md rounded-lg p-4">
         <p class="mb-2">{{ comment.content }}</p>
         <div class="text-sm text-gray-500">
@@ -32,10 +49,19 @@
         </div>
     </div>
     {% endfor %}
+    
+    <div class="mt-4">
+        {% if comments.has_prev %}
+            <a href="{{ url_for('main.search', q=query, user=user, page=comments.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
+        {% endif %}
+        {% if comments.has_next %}
+            <a href="{{ url_for('main.search', q=query, user=user, page=comments.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
+        {% endif %}
+    </div>
     {% endif %}
 
-    {% if not links and not comments %}
-    <p class="text-gray-700">No results found for "{{ query }}".</p>
+    {% if not links.items and not comments.items %}
+    <p class="text-gray-700">No results found for "{{ query }}"{% if user %} by user "{{ user }}"{% endif %}.</p>
     {% endif %}
 </div>
 {% endblock %}

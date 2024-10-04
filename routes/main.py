@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import Link, Comment
+from models import Link, Comment, User
 from app import db
 from utils import get_top_links
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 bp = Blueprint('main', __name__)
 
@@ -47,11 +47,35 @@ def item(id):
 
 @bp.route('/search')
 def search():
-    query = request.args.get('q')
-    if query:
-        links = Link.query.filter(or_(Link.title.ilike(f'%{query}%'), Link.url.ilike(f'%{query}%'))).all()
-        comments = Comment.query.filter(Comment.content.ilike(f'%{query}%')).all()
+    query = request.args.get('q', '')
+    user = request.args.get('user', '')
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    if query or user:
+        links_query = Link.query
+        comments_query = Comment.query
+
+        if query:
+            links_query = links_query.filter(or_(
+                func.lower(Link.title).contains(func.lower(query)),
+                func.lower(Link.url).contains(func.lower(query))
+            ))
+            comments_query = comments_query.filter(func.lower(Comment.content).contains(func.lower(query)))
+
+        if user:
+            user_obj = User.query.filter(func.lower(User.username) == func.lower(user)).first()
+            if user_obj:
+                links_query = links_query.filter(Link.user_id == user_obj.id)
+                comments_query = comments_query.filter(Comment.user_id == user_obj.id)
+            else:
+                flash(f"User '{user}' not found.")
+                return redirect(url_for('main.search'))
+
+        links = links_query.paginate(page=page, per_page=per_page, error_out=False)
+        comments = comments_query.paginate(page=page, per_page=per_page, error_out=False)
     else:
         links = []
         comments = []
-    return render_template('search_results.html', links=links, comments=comments, query=query)
+
+    return render_template('search_results.html', links=links, comments=comments, query=query, user=user)
