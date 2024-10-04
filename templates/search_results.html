@@ -27,9 +27,9 @@
             </div>
         </div>
         <div class="flex justify-end">
-            <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">
+            <a href="#" onclick="event.preventDefault(); this.closest('form').submit();" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">
                 Search
-            </button>
+            </a>
         </div>
     </form>
 
@@ -97,4 +97,14 @@
     <p class="text-gray-700 dark:text-gray-300">No results found for "{{ query }}".</p>
     {% endif %}
 </div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const queryInput = this.querySelector('input[name="q"]');
+        if (!queryInput.value.trim()) {
+            e.preventDefault();
+            queryInput.focus();
+        }
+    });
+</script>
 {% endblock %}
