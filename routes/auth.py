@@ -62,3 +62,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+@bp.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)
