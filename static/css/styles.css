@@ -71,3 +71,7 @@
 .dark .border-yellow-500 {
     border-color: #d69e2e;
 }
+
+.dark .text-gray-800 {
+    color: #ffffff;
+}
