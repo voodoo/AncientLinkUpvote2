@@ -5,16 +5,21 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             const linkId = this.dataset.linkId;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
             fetch(`/api/upvote/${linkId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrf_token')
+                    'X-CSRFToken': csrfToken
                 },
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    if (response.status === 401) {
+                        throw new Error('You must be logged in to vote');
+                    }
+                    return response.json().then(err => { throw err; });
                 }
                 return response.json();
             })
@@ -25,17 +30,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.classList.add('text-blue-500');
                     this.disabled = true;
                 } else {
-                    alert(data.error || 'An error occurred while voting');
+                    throw new Error(data.error || 'An error occurred while voting');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while voting');
+                alert(error.message || 'An error occurred while voting');
+                if (error.message === 'You must be logged in to vote') {
+                    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+                }
             });
         });
     });
 
-    // Reply functionality
+    // Reply functionality (unchanged)
     const replyButtons = document.querySelectorAll('.reply-btn');
     replyButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -46,18 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Function to get CSRF token from cookies
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+// Function to get CSRF token from meta tag (unused, keeping for reference)
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 }
