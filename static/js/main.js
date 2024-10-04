@@ -2,12 +2,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Upvote functionality
     const upvoteButtons = document.querySelectorAll('.upvote-btn');
     upvoteButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             const linkId = this.dataset.linkId;
             fetch(`/api/upvote/${linkId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrf_token')
                 },
             })
             .then(response => response.json())
@@ -15,10 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     const scoreElement = document.getElementById(`score-${linkId}`);
                     scoreElement.textContent = data.new_score;
+                    this.classList.add('text-blue-500');
                     this.disabled = true;
-                    this.style.color = '#4a5568';
                 } else {
-                    alert('You have already voted for this link');
+                    alert(data.error || 'An error occurred while voting');
                 }
             })
             .catch(error => {
@@ -38,3 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

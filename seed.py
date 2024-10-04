@@ -13,6 +13,25 @@ ANCIENT_HISTORY_TOPICS = [
     "Mycenaean Greece", "Sumer", "Akkadian Empire", "Ancient Nubia"
 ]
 
+ANCIENT_HISTORY_PHRASES = [
+    "Discoveries in", "New findings about", "The rise and fall of",
+    "Uncovering secrets of", "Archaeological breakthroughs in",
+    "The mysteries of", "Daily life in", "Warfare and politics in",
+    "Art and culture of", "Religious practices in", "Trade routes of",
+    "Technological advancements in", "The rulers of", "Monuments and architecture of",
+    "Ancient texts reveal", "Myths and legends of", "The fall of",
+    "Excavations uncover", "Historical analysis of", "Reconstructing"
+]
+
+def generate_ancient_history_title():
+    topic = random.choice(ANCIENT_HISTORY_TOPICS)
+    phrase = random.choice(ANCIENT_HISTORY_PHRASES)
+    return f"{phrase} {topic}"
+
+def generate_ancient_history_url():
+    topic = random.choice(ANCIENT_HISTORY_TOPICS).lower().replace(" ", "-")
+    return f"https://ancient-history-news.com/{topic}/{fake.slug()}"
+
 def seed_database():
     # Clear existing data
     db.session.query(Vote).delete()
@@ -21,9 +40,9 @@ def seed_database():
     db.session.query(User).delete()
     db.session.commit()
 
-    # Create 2 users
+    # Create 5 users
     users = []
-    for _ in range(2):
+    for _ in range(5):
         user = User(
             username=fake.user_name(),
             email=fake.email(),
@@ -33,21 +52,20 @@ def seed_database():
         db.session.add(user)
     db.session.commit()
 
-    # Create 20 links
+    # Create 50 links
     links = []
-    for _ in range(20):
-        topic = random.choice(ANCIENT_HISTORY_TOPICS)
+    for _ in range(50):
         link = Link(
-            title=f"{fake.catch_phrase()} in {topic}",
-            url=f"https://{fake.domain_name()}/ancient-history/{fake.slug()}",
+            title=generate_ancient_history_title(),
+            url=generate_ancient_history_url(),
             user=random.choice(users)
         )
         links.append(link)
         db.session.add(link)
     db.session.commit()
 
-    # Create 40 votes
-    for _ in range(40):
+    # Create 100 votes
+    for _ in range(100):
         vote = Vote(
             user=random.choice(users),
             link=random.choice(links)
@@ -56,8 +74,8 @@ def seed_database():
         link.score += 1
     db.session.commit()
 
-    # Create 50 comments (some as replies)
-    for _ in range(50):
+    # Create 200 comments (some as replies)
+    for _ in range(200):
         parent = None
         if random.random() < 0.3 and Comment.query.count() > 0:
             parent = random.choice(Comment.query.all())
