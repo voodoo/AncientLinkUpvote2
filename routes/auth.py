@@ -1,6 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Email
 from models import User
 from app import db, login_manager
 
@@ -9,6 +12,12 @@ bp = Blueprint('auth', __name__)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Log In')
 
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -41,24 +50,15 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        remember = True if request.form.get('remember') else False
-        
-        user = User.query.filter_by(email=email).first()
-        
-        if not user or not user.check_password(password):
-            flash('Please check your login details and try again.')
-            return redirect(url_for('auth.login'))
-        
-        login_user(user, remember=remember)
-        next_page = request.args.get('next')
-        if next_page:
-            return redirect(next_page)
-        return redirect(url_for('main.index'))
-    
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('main.index'))
+        flash('Invalid email or password')
+    return render_template('login.html', form=form)
 
 @bp.route('/logout')
 @login_required
