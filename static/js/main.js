@@ -55,8 +55,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// Function to get CSRF token from meta tag (unused, keeping for reference)
-function getCsrfToken() {
-    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-}
