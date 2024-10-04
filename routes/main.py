@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from models import Link, Comment
 from app import db
 from utils import get_top_links
+from sqlalchemy import or_
 
 bp = Blueprint('main', __name__)
 
@@ -43,3 +44,14 @@ def item(id):
         flash('Your comment has been added.')
         return redirect(url_for('main.item', id=id))
     return render_template('item.html', link=link)
+
+@bp.route('/search')
+def search():
+    query = request.args.get('q')
+    if query:
+        links = Link.query.filter(or_(Link.title.ilike(f'%{query}%'), Link.url.ilike(f'%{query}%'))).all()
+        comments = Comment.query.filter(Comment.content.ilike(f'%{query}%')).all()
+    else:
+        links = []
+        comments = []
+    return render_template('search_results.html', links=links, comments=comments, query=query)

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-4">
+    <h2 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"</h2>
+
+    {% if links %}
+    <h3 class="text-xl font-bold mb-2">Links</h3>
+    {% for link in links %}
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <div class="flex items-center">
+            <span class="font-bold mr-2">{{ link.score }}</span>
+            <a href="{{ url_for('main.item', id=link.id) }}" class="text-blue-600 hover:underline">{{ link.title }}</a>
+            <a href="{{ link.url }}" class="text-gray-500 hover:underline text-sm ml-2" target="_blank">({{ urlparse(link.url).netloc }})</a>
+        </div>
+        <div class="text-sm text-gray-500 mt-1">
+            submitted {{ link.created_at|timeago }} by {{ link.user.username }}
+            | <a href="{{ url_for('main.item', id=link.id) }}" class="hover:underline">{{ link.comments|length }} comments</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if comments %}
+    <h3 class="text-xl font-bold mb-2 mt-6">Comments</h3>
+    {% for comment in comments %}
+    <div class="bg-white shadow-md rounded-lg p-4">
+        <p class="mb-2">{{ comment.content }}</p>
+        <div class="text-sm text-gray-500">
+            by {{ comment.user.username }} | {{ comment.created_at|timeago }}
+            | on <a href="{{ url_for('main.item', id=comment.link.id) }}" class="text-blue-600 hover:underline">{{ comment.link.title }}</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if not links and not comments %}
+    <p class="text-gray-700">No results found for "{{ query }}".</p>
+    {% endif %}
+</div>
+{% endblock %}
