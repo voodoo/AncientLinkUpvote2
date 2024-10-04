@@ -35,9 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert(error.message || 'An error occurred while voting');
                 if (error.message === 'You must be logged in to vote') {
-                    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+                    const currentPath = encodeURIComponent(window.location.pathname);
+                    window.location.href = `/login?next=${currentPath}`;
+                } else {
+                    alert(error.message || 'An error occurred while voting');
                 }
             });
         });

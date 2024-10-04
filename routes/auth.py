@@ -53,6 +53,9 @@ def login():
             return redirect(url_for('auth.login'))
         
         login_user(user, remember=remember)
+        next_page = request.args.get('next')
+        if next_page:
+            return redirect(next_page)
         return redirect(url_for('main.index'))
     
     return render_template('login.html')
