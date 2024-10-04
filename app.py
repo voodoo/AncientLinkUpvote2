@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from flask_login import LoginManager
 from filters import timeago
+from urllib.parse import urlparse
 
 class Base(DeclarativeBase):
     pass
@@ -25,6 +26,7 @@ def create_app():
     login_manager.login_view = 'auth.login'
 
     app.jinja_env.filters['timeago'] = timeago
+    app.jinja_env.filters['urlparse'] = urlparse
 
     with app.app_context():
         from models import User, Link, Comment, Vote

@@ -5,6 +5,14 @@ import random
 
 fake = Faker()
 
+ANCIENT_HISTORY_TOPICS = [
+    "Ancient Egypt", "Roman Empire", "Greek Civilization", "Mesopotamia",
+    "Indus Valley Civilization", "Ancient China", "Mayan Civilization",
+    "Inca Empire", "Aztec Empire", "Persia", "Carthage", "Phoenicia",
+    "Babylon", "Assyria", "Hittite Empire", "Minoan Civilization",
+    "Mycenaean Greece", "Sumer", "Akkadian Empire", "Ancient Nubia"
+]
+
 def seed_database():
     # Clear existing data
     db.session.query(Vote).delete()
@@ -28,9 +36,10 @@ def seed_database():
     # Create 20 links
     links = []
     for _ in range(20):
+        topic = random.choice(ANCIENT_HISTORY_TOPICS)
         link = Link(
-            title=fake.catch_phrase(),
-            url=fake.url(),
+            title=f"{fake.catch_phrase()} in {topic}",
+            url=f"https://{fake.domain_name()}/ancient-history/{fake.slug()}",
             user=random.choice(users)
         )
         links.append(link)

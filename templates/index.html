@@ -7,7 +7,8 @@
         <div class="flex items-center">
             <button class="upvote-btn mr-2" data-link-id="{{ link.id }}">▲</button>
             <span class="font-bold mr-2">{{ link.score }}</span>
-            <a href="{{ link.url }}" class="text-blue-600 hover:underline" target="_blank">{{ link.title }}</a>
+            <a href="{{ url_for('main.item', id=link.id) }}" class="text-blue-600 hover:underline">{{ link.title }}</a>
+            <a href="{{ link.url }}" class="text-gray-500 hover:underline text-sm ml-2" target="_blank">({{ urlparse(link.url).netloc }})</a>
         </div>
         <div class="text-sm text-gray-500 mt-1">
             submitted {{ link.created_at|timeago }} by {{ link.user.username }}
