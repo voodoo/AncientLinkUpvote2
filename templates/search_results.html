@@ -2,11 +2,10 @@
 
 {% block content %}
 <div class="space-y-4">
-    <h2 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"{% if user %} by user "{{ user }}"{% endif %}</h2>
+    <h2 class="text-2xl font-bold mb-4">Search Results for "{{ query }}"</h2>
 
     <form action="{{ url_for('main.search') }}" method="GET" class="mb-4">
-        <input type="text" name="q" value="{{ query }}" placeholder="Search..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
-        <input type="text" name="user" value="{{ user }}" placeholder="Filter by user..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 mr-2">
         <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">
             Search
         </button>
@@ -30,10 +29,10 @@
     
     <div class="mt-4">
         {% if links.has_prev %}
-            <a href="{{ url_for('main.search', q=query, user=user, page=links.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
+            <a href="{{ url_for('main.search', q=query, page=links.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
         {% endif %}
         {% if links.has_next %}
-            <a href="{{ url_for('main.search', q=query, user=user, page=links.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
+            <a href="{{ url_for('main.search', q=query, page=links.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
         {% endif %}
     </div>
     {% endif %}
@@ -52,16 +51,16 @@
     
     <div class="mt-4">
         {% if comments.has_prev %}
-            <a href="{{ url_for('main.search', q=query, user=user, page=comments.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
+            <a href="{{ url_for('main.search', q=query, page=comments.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
         {% endif %}
         {% if comments.has_next %}
-            <a href="{{ url_for('main.search', q=query, user=user, page=comments.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
+            <a href="{{ url_for('main.search', q=query, page=comments.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
         {% endif %}
     </div>
     {% endif %}
 
     {% if not links.items and not comments.items %}
-    <p class="text-gray-700">No results found for "{{ query }}"{% if user %} by user "{{ user }}"{% endif %}.</p>
+    <p class="text-gray-700">No results found for "{{ query }}".</p>
     {% endif %}
 </div>
 {% endblock %}
