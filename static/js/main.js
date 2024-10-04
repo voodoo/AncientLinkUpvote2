@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const scoreElement = this.nextElementSibling;
+                    const scoreElement = document.getElementById(`score-${linkId}`);
                     scoreElement.textContent = data.new_score;
                     this.disabled = true;
                     this.style.color = '#4a5568';

@@ -5,8 +5,11 @@
     <h2 class="text-2xl font-bold mb-2">{{ link.title }}</h2>
     <a href="{{ link.url }}" class="text-blue-600 hover:underline" target="_blank">{{ link.url }}</a>
     <p class="text-sm text-gray-500 mt-2">
-        {{ link.score }} points | submitted {{ link.created_at|timeago }} by {{ link.user.username }}
+        <span id="score-{{ link.id }}">{{ link.score }}</span> points | submitted {{ link.created_at|timeago }} by {{ link.user.username }}
     </p>
+    <button class="upvote-btn mt-2 bg-blue-500 text-white font-bold py-1 px-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline" data-link-id="{{ link.id }}">
+        Upvote
+    </button>
 </div>
 
 <div class="mt-8">
