@@ -17,7 +17,7 @@ def upvote(link_id):
             current_app.logger.info(f"User {current_user.id} has already voted for link {link_id}")
             return jsonify({'error': 'You have already voted for this link'}), 400
         
-        new_vote = Vote(user=current_user, link=link)
+        new_vote = Vote(user_id=current_user.id, link_id=link_id)
         db.session.add(new_vote)
         link.score += 1
         db.session.commit()

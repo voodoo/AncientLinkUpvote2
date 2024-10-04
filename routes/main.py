@@ -3,7 +3,8 @@ from flask_login import login_required, current_user
 from models import Link, Comment, User
 from app import db
 from utils import get_top_links
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, and_
+from datetime import datetime, timedelta
 
 bp = Blueprint('main', __name__)
 
@@ -48,20 +49,34 @@ def item(id):
 @bp.route('/search')
 def search():
     query = request.args.get('q', '')
+    search_type = request.args.get('type', 'all')
+    date_range = request.args.get('date_range', 'all')
     page = request.args.get('page', 1, type=int)
     per_page = 10
 
     if query:
-        links_query = Link.query.filter(or_(
-            func.lower(Link.title).contains(func.lower(query)),
-            func.lower(Link.url).contains(func.lower(query))
-        ))
+        links_query = Link.query.filter(
+            or_(
+                func.lower(Link.title).contains(func.lower(query)),
+                func.lower(Link.url).contains(func.lower(query))
+            )
+        )
         comments_query = Comment.query.filter(func.lower(Comment.content).contains(func.lower(query)))
 
-        links = links_query.paginate(page=page, per_page=per_page, error_out=False)
-        comments = comments_query.paginate(page=page, per_page=per_page, error_out=False)
-    else:
-        links = Link.query.paginate(page=page, per_page=per_page, error_out=False)
-        comments = Comment.query.paginate(page=page, per_page=per_page, error_out=False)
+        if date_range != 'all':
+            date_filter = datetime.utcnow() - timedelta(days=int(date_range))
+            links_query = links_query.filter(Link.created_at >= date_filter)
+            comments_query = comments_query.filter(Comment.created_at >= date_filter)
 
-    return render_template('search_results.html', links=links, comments=comments, query=query)
+        if search_type == 'links':
+            comments_query = Comment.query.filter(False)
+        elif search_type == 'comments':
+            links_query = Link.query.filter(False)
+
+        links = links_query.order_by(Link.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        comments = comments_query.order_by(Comment.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    else:
+        links = Link.query.order_by(Link.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        comments = Comment.query.order_by(Comment.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    return render_template('search_results.html', links=links, comments=comments, query=query, search_type=search_type, date_range=date_range)

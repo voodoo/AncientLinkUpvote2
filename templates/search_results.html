@@ -6,12 +6,24 @@
 
     <form action="{{ url_for('main.search') }}" method="GET" class="mb-4">
         <input type="text" name="q" value="{{ query }}" placeholder="Search..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 mr-2">
+        <select name="type" class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 mr-2">
+            <option value="all" {% if search_type == 'all' %}selected{% endif %}>All</option>
+            <option value="links" {% if search_type == 'links' %}selected{% endif %}>Links</option>
+            <option value="comments" {% if search_type == 'comments' %}selected{% endif %}>Comments</option>
+        </select>
+        <select name="date_range" class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 mr-2">
+            <option value="all" {% if date_range == 'all' %}selected{% endif %}>All time</option>
+            <option value="1" {% if date_range == '1' %}selected{% endif %}>Last 24 hours</option>
+            <option value="7" {% if date_range == '7' %}selected{% endif %}>Last week</option>
+            <option value="30" {% if date_range == '30' %}selected{% endif %}>Last month</option>
+            <option value="365" {% if date_range == '365' %}selected{% endif %}>Last year</option>
+        </select>
         <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">
             Search
         </button>
     </form>
 
-    {% if links.items %}
+    {% if links.items and (search_type == 'all' or search_type == 'links') %}
     <h3 class="text-xl font-bold mb-2">Links</h3>
     {% for link in links.items %}
     <div class="bg-white shadow-md rounded-lg p-4">
@@ -27,17 +39,19 @@
     </div>
     {% endfor %}
     
+    {% if links.has_prev or links.has_next %}
     <div class="mt-4">
         {% if links.has_prev %}
-            <a href="{{ url_for('main.search', q=query, page=links.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
+            <a href="{{ url_for('main.search', q=query, type=search_type, date_range=date_range, page=links.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
         {% endif %}
         {% if links.has_next %}
-            <a href="{{ url_for('main.search', q=query, page=links.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
+            <a href="{{ url_for('main.search', q=query, type=search_type, date_range=date_range, page=links.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
         {% endif %}
     </div>
     {% endif %}
+    {% endif %}
 
-    {% if comments.items %}
+    {% if comments.items and (search_type == 'all' or search_type == 'comments') %}
     <h3 class="text-xl font-bold mb-2 mt-6">Comments</h3>
     {% for comment in comments.items %}
     <div class="bg-white shadow-md rounded-lg p-4">
@@ -49,14 +63,16 @@
     </div>
     {% endfor %}
     
+    {% if comments.has_prev or comments.has_next %}
     <div class="mt-4">
         {% if comments.has_prev %}
-            <a href="{{ url_for('main.search', q=query, page=comments.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
+            <a href="{{ url_for('main.search', q=query, type=search_type, date_range=date_range, page=comments.prev_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Previous</a>
         {% endif %}
         {% if comments.has_next %}
-            <a href="{{ url_for('main.search', q=query, page=comments.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
+            <a href="{{ url_for('main.search', q=query, type=search_type, date_range=date_range, page=comments.next_num) }}" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">Next</a>
         {% endif %}
     </div>
+    {% endif %}
     {% endif %}
 
     {% if not links.items and not comments.items %}

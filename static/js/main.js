@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.classList.remove('upvote-btn-inactive');
                     this.classList.add('upvote-btn-active');
                     this.disabled = true;
+                    alert('You have already voted for this link');
                 } else {
                     alert(error.message || 'An error occurred while voting');
                 }
