@@ -5,6 +5,7 @@ from app import db
 from utils import get_top_links
 from sqlalchemy import or_, func, and_
 from datetime import datetime, timedelta
+from urllib.parse import urlparse
 
 bp = Blueprint('main', __name__)
 
@@ -46,8 +47,11 @@ def item(id):
         return redirect(url_for('main.item', id=id))
     return render_template('item.html', link=link)
 
-@bp.route('/search')
+@bp.route('/link/search')
 def search():
+    if not request.args:
+        return render_template('search_results.html', links=None, comments=None, query='', search_type='all', date_range='all', urlparse=urlparse)
+
     query = request.args.get('q', '')
     search_type = request.args.get('type', 'all')
     date_range = request.args.get('date_range', 'all')
@@ -79,4 +83,4 @@ def search():
         links = Link.query.order_by(Link.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
         comments = Comment.query.order_by(Comment.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
-    return render_template('search_results.html', links=links, comments=comments, query=query, search_type=search_type, date_range=date_range)
+    return render_template('search_results.html', links=links, comments=comments, query=query, search_type=search_type, date_range=date_range, urlparse=urlparse)
