@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light dark:bg-gray-800 dark:text-white">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,28 +8,33 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-md">
+<body class="bg-gray-100 dark:bg-gray-900">
+    <nav class="bg-white dark:bg-gray-800 shadow-md">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <a href="{{ url_for('main.index') }}" class="text-xl font-bold text-gray-800">Ancient History News</a>
+                <a href="{{ url_for('main.index') }}" class="text-xl font-bold text-gray-800 dark:text-white">Ancient History News</a>
                 <div class="flex items-center">
-                    <a href="{{ url_for('main.submit') }}" class="text-gray-600 hover:text-gray-800 mr-4">Submit</a>
+                    <a href="{{ url_for('main.submit') }}" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white mr-4">Submit</a>
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('auth.profile') }}" class="text-gray-600 hover:text-gray-800 mr-4">Profile</a>
-                        <a href="{{ url_for('auth.logout') }}" class="text-gray-600 hover:text-gray-800">Logout</a>
+                        <a href="{{ url_for('auth.profile') }}" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white mr-4">Profile</a>
+                        <a href="{{ url_for('auth.logout') }}" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white">Logout</a>
                     {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="text-gray-600 hover:text-gray-800 mr-4">Login</a>
-                        <a href="{{ url_for('auth.signup') }}" class="text-gray-600 hover:text-gray-800">Sign Up</a>
+                        <a href="{{ url_for('auth.login') }}" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white mr-4">Login</a>
+                        <a href="{{ url_for('auth.signup') }}" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white">Sign Up</a>
                     {% endif %}
+                    <button id="darkModeToggle" class="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white ml-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
-    <div class='bg-gray-200 py-2'>
+    <div class='bg-gray-200 dark:bg-gray-700 py-2'>
         <div class='container mx-auto px-4'>
             <form action="{{ url_for('main.search') }}" method="GET" class="flex justify-center">
-                <input type="text" name="q" placeholder="Search..." class="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 mr-2 w-1/2">
+                <input type="text" name="q" placeholder="Search..." class="px-3 py-2 border rounded-lg text-gray-700 dark:text-gray-300 dark:bg-gray-600 focus:outline-none focus:border-blue-500 mr-2 w-1/2">
                 <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:shadow-outline">
                     Search
                 </button>
@@ -40,7 +45,7 @@
     <main class="container mx-auto mt-8 px-4">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 dark:bg-yellow-900 dark:border-yellow-600 dark:text-yellow-200" role="alert">
                     {% for message in messages %}
                         <p>{{ message }}</p>
                     {% endfor %}
@@ -52,5 +57,23 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme preference or use system preference
+        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const hasUserPreference = localStorage.getItem('darkMode');
+
+        if (hasUserPreference === 'true' || (!hasUserPreference && darkModeMediaQuery.matches)) {
+            htmlElement.classList.add('dark');
+        }
+
+        // Toggle dark mode
+        darkModeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', htmlElement.classList.contains('dark'));
+        });
+    </script>
 </body>
 </html>
