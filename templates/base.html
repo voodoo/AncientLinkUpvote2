@@ -54,23 +54,5 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script>
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const htmlElement = document.documentElement;
-
-        // Check for saved theme preference or use system preference
-        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const hasUserPreference = localStorage.getItem('darkMode');
-
-        if (hasUserPreference === 'true' || (!hasUserPreference && darkModeMediaQuery.matches)) {
-            htmlElement.classList.add('dark');
-        }
-
-        // Toggle dark mode
-        darkModeToggle.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', htmlElement.classList.contains('dark'));
-        });
-    </script>
 </body>
 </html>

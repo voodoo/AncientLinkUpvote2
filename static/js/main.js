@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Reply functionality (unchanged)
+    // Reply functionality
     const replyButtons = document.querySelectorAll('.reply-btn');
     replyButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -60,5 +60,40 @@ document.addEventListener('DOMContentLoaded', function() {
             const replyForm = document.querySelector(`.reply-form[data-comment-id="${commentId}"]`);
             replyForm.classList.toggle('hidden');
         });
+    });
+
+    // Dark mode functionality
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or use system preference
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const hasUserPreference = localStorage.getItem('darkMode');
+
+    function setDarkMode(isDark) {
+        if (isDark) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+        localStorage.setItem('darkMode', isDark);
+    }
+
+    // Set initial dark mode
+    if (hasUserPreference === 'true' || (!hasUserPreference && darkModeMediaQuery.matches)) {
+        setDarkMode(true);
+    }
+
+    // Toggle dark mode
+    darkModeToggle.addEventListener('click', () => {
+        const isDark = htmlElement.classList.toggle('dark');
+        setDarkMode(isDark);
+    });
+
+    // Listen for system preference changes
+    darkModeMediaQuery.addListener((e) => {
+        if (!localStorage.getItem('darkMode')) {
+            setDarkMode(e.matches);
+        }
     });
 });
